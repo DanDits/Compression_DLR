@@ -1,4 +1,4 @@
-function [] = Demo_Heat(GridType, approx)
+function [] = Demo_Heat(GridType, approx, fixedRank)
 
 %For solving the two dimensional heat equation dA/dt - laplace(A) = F(A)
 %with dirichlet boundary conditions on an arbitrary domain D we get the
@@ -10,9 +10,14 @@ close all hidden
 if nargin <= 1
     approx = 0.33; %default approximation level, keep only one third of data
 end
-approxAsRank = '';
+if nargin <= 2
+    approxRankFixed = '';
+elseif strcmp(fixedRank, 'fixed')
+    approxRankFixed = '!';
+end
+approxAsRank = strcat('', approxRankFixed);
 if approx > 1
-    approxAsRank = 'asrank';
+    approxAsRank = strcat('asrank', approxRankFixed);
 end
 %grid inside region [0,1]x[0,1]
 T = 5;

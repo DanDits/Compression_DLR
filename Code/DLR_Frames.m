@@ -14,7 +14,7 @@ StartA = FramesIn(:,:,1); %Starting value
 if nargin <= 2
     approxAsRank = '';
 end
-[Frames, r] = DLR(StartA, frameCount, @Get_Delta, @Make_Frame, approx, approxAsRank);
+[Frames, approxRanks] = DLR(StartA, frameCount, @Get_Delta, @Make_Frame, approx, approxAsRank);
 
 %% Only responsible for optionally plotting the error
 if nargin >= 4 && strcmp(plotError, 'errors')
@@ -39,7 +39,7 @@ if nargin >= 5 && strcmp(plotRanks(1:5), 'ranks') ...
        ranks(i) = rank(FramesIn(:,:,i)); 
     end
     figure();
-    plot(1:frameCount, ranks, 'o', 1:frameCount, ones(frameCount,1) * r);
+    plot(1:frameCount, ranks, 'o', 1:frameCount, approxRanks);
     title('Involved ranks');
     legend('Rank of given frame', 'Used approximation rank r');
     xlabel('Frame number')

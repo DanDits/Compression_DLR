@@ -1,4 +1,4 @@
-function [] = Demo(type, approx)
+function [] = Demo(type, approx, fixedRank)
 %Interesting parameters: 'gif3.gif', 0.33 and then 0.65 -> großes Bild
 %   'gif2.gif' -> unstetige indizierte Farben
 %   'gif1.gif' -> maximaler Rang
@@ -12,9 +12,14 @@ close all hidden
 if nargin <= 1
     approx = 0.33; %default approximation level, keep only one third of data
 end
-approxAsRank = '';
+if nargin <= 2
+    approxRankFixed = '';
+elseif strcmp(fixedRank, 'fixed')
+    approxRankFixed = '!';
+end
+approxAsRank = strcat('', approxRankFixed);
 if approx > 1
-    approxAsRank = 'asrank';
+    approxAsRank = strcat('asrank', approxRankFixed);
 end
 if ~isempty(type)
     if strcmp(type,'fractal')
