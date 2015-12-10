@@ -1,3 +1,4 @@
+%LICENSE: SEE file license_kasim_tasdemir.txt
 function dispstat(TXT,varargin)
 % Prints overwritable message to the command line. If you dont want to keep
 % this message, call dispstat function with option 'keepthis'. If you want to
