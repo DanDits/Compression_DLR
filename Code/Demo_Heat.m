@@ -1,4 +1,4 @@
-function [] = Demo_Heat(GridType, approx, fixedRank)
+function [Frames, X, Y, tau] = Demo_Heat(GridType, approx, fixedRank)
 
 %For solving the two dimensional heat equation dA/dt - laplace(A) = F(A)
 %with dirichlet boundary conditions on an arbitrary domain D we get the
@@ -20,40 +20,28 @@ if approx > 1
     approxAsRank = strcat('asrank', approxRankFixed);
 end
 %grid inside region [0,1]x[0,1]
-T = 5;
+T = 15;
 tau = 0.05;
-slowDownFactor = 5;
+slowDownFactor = 1;
 
 n = 128;
 
 function value = F(t, x, y)
-
-    d1 = sqrt((x-0.5)^2 + (y-0.25)^2);
-    d2 = sqrt((x-0.5)^2 + (y-0.75)^2);
+    frac = t / T;
     r = 0.05;
-    if ((d1 <= r && t < 0.33*T) || (d2 <= r && t < 0.66 * T))
-       value = min(d1, d2) * 1000000;
-    else 
-        value = 0;
+    d1 = sqrt((x-frac)^2 + (y-0.5)^2);
+    d2 = sqrt((x-0.5)^2 + (y-frac)^2);
+    value = 0;
+    if (d1 <= r)
+        value = value + 200000;
+    end
+    if (d2 <= r)
+        value = value + 200000;
     end
 end
 [Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F, approx, approxAsRank);
 
-%% Animate frames in a surface plot
-s = surf(X, Y, Frames(:,:,1),'EdgeColor','none','LineStyle','none');
-colormap('hot')
-colorbar
-totalMin = min(min(min(Frames)));
-totalMax =  max(totalMin + 1, max(max(max(Frames))));
-caxis([totalMin totalMax] ) ; 
-mode manual;
-zlim([totalMin totalMax]);
-view(45,45);
-for j = 2:size(Frames,3)
-   s.ZData = Frames(:,:,j); 
-   title(strcat('Time passed:  ', num2str((j - 1) * tau, '%.1f'), '/', num2str(T, '%.1f')));
-   pause(tau * slowDownFactor);
-end
+Animated_Surf(Frames, X, Y, tau, slowDownFactor);
 
 end
 

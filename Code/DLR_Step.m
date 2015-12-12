@@ -6,6 +6,7 @@ function [U, S, V] = DLR_Step(U, S, V, DeltaA)
 %% Perform a Dynamic low rank step, using first order splitting method
 %see 3.2 in paper, given Y = USV' and DeltaA 
 % calculate same decomposition for next A, exact if rank A <= r
+% computational cost: O(mnr + (m+n)r^2), for size(DeltaA)=m,n and len(S)=r
 
 %Step1:
 K = U * S + DeltaA * V;

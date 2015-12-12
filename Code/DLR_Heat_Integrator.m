@@ -45,17 +45,16 @@ function DeltaA = Get_Delta(Current, stepIndex)
             end
         end
     end
-    DeltaA = tau * (SolveLaplace(M, fVector, innerIndicies, hCorrected, Grid) - Current);
+    DeltaA = tau * (Solve_Laplace(M, fVector, innerIndicies, hCorrected, Grid) - Current);
 end
 if nargin <= 7
     approxAsRank = '';
 end
 StartA = zeros(size(Grid));
 [Frames, ~] = DLR(StartA, timeSteps + 1, @Get_Delta, @Make_Simple_Frame, approx, approxAsRank);
-
 end
 
-function A = SolveLaplace(M, fVector, innerIndicies, h, Grid)
+function A = Solve_Laplace(M, fVector, innerIndicies, h, Grid)
 u = M\fVector;
 A = zeros(size(Grid));
 A(innerIndicies) = h^2 * full(u(Grid(innerIndicies))); 

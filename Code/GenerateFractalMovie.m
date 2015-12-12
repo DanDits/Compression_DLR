@@ -12,14 +12,14 @@ fracDim = length(coordRange);
 Frames = zeros(fracDim, fracDim, length(cRange));
 index = 1; 
 dispstat('','init')
-dispstat(sprintf('Frame generation started...'),'keepthis','timestamp');
+dispstat(sprintf('Rendering fractal movie...'),'keepthis','timestamp');
 for c = cRange
     fractalFunc = @(z) z*z + c; % Mandelbrot fractal function, takes complex values z 
     Frames(:,:,index) = generateFractalImage(fractalFunc, fractalValueBound, maxIt, coordRange);
     index = index + 1;
     dispstat(sprintf('Progress %d%%',min(100, floor(index / length(cRange) * 100))),'timestamp');
 end
-dispstat('Finished frame generation. Now generating movie...','keepprev');
+dispstat('Rendering finished. Now generating movie...','keepprev');
 Movie = FramesToMovie(Frames);
 disp('Movie generated');
 end

@@ -6,8 +6,6 @@ global M
 global Frames
 global map
 global autoReverse
-global MW1
-global MW2
 close all hidden
 if nargin <= 1
     approx = 0.33; %default approximation level, keep only one third of data
