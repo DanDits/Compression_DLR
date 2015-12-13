@@ -55,7 +55,7 @@ ranks = zeros(frameCount, 1);
 currR = maxR; 
 
 %Given a mxn matrix StartA
-[U,S,V] = GetRankApprox(StartA, currR);
+[U,S,V] = Get_Rank_Approx(StartA, currR);
 
 %S is now diagonal, though it would only need to be invertible
 Frames = zeros(frameDim(1), frameDim(2), frameCount);
@@ -65,6 +65,17 @@ for i = 1:frameCount
     %Save to Frames
     ranks(i) = currR;
     Frames(:,:,i) = MakeFrame(U, S, V);
+    
+    %FOR TESTING SOME PROPERTIES OF VVS FOR SOME FRAMES ONLY:
+%     if i >= 8 && i <= 11
+%         
+%         aRank = rank(FRAMESIN(:,:,i));
+%         [~,~,AV] = Get_Rank_Approx(FRAMESIN(:,:,i), currR);
+%         VVS = AV'*V;
+%         disp(strcat(num2str(i), '_: rankA=', num2str(aRank), ' norm vv_s=', num2str(norm(VVS)), ...
+%             ' cond vv_s=', num2str(cond(VVS)), ' rank vv_s=', num2str(rank(VVS)), ...
+%             ' dim vv_s=', num2str(size(VVS, 1))));
+%     end
     
     %except for the last frame, perform the DLR step to the next frame
     if i < frameCount
@@ -80,7 +91,7 @@ for i = 1:frameCount
                 
                 % we overapproximated! we can go smaller
                 currR = rankS;
-                [US, S, VS] = GetRankApprox(S, currR);
+                [US, S, VS] = Get_Rank_Approx(S, currR);
                 U = U * US;
                 V = V * VS;
             elseif rankS == currR && currR < maxR
@@ -99,7 +110,7 @@ end
 
 end
 
-function [U,S,V] = GetRankApprox(A, r)
+function [U,S,V] = Get_Rank_Approx(A, r)
 % Calculate singular value decomposition and use spectral cutoff to get
 % rank r
 

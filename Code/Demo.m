@@ -1,5 +1,5 @@
 function [] = Demo(type, approx, fixedRank)
-%Interesting parameters: 'gif3.gif', 0.33 and then 0.65 -> großes Bild
+%Interesting parameters: 'gif3.gif', -> großes Bild
 %   'gif2.gif' -> unstetige indizierte Farben
 %   'gif1.gif' -> maximaler Rang
 global M
@@ -37,9 +37,12 @@ FramesC = DLR_Frames(Frames, approx, approxAsRank, 'errors', 'ranks!'); M2 = Fra
 %Automatically set figure windows to left and right side of screen and
 set(MW1.Parent,'units','normalized','outerposition',[0 0 0.5 1])
 set(MW2.Parent,'units','normalized','outerposition',[0.5 0 0.5 1])
+set(MW1.Parent, 'Name', 'Source data');
+set(MW2.Parent, 'Name', strcat('Compressed data, approx=', num2str(approx)));
 % bring them to the front
 figure(MW1.Parent)
 figure(MW2.Parent)
+
 %and start playing at the same time (using set auto reverse mode)
 StartPlayer(MW1, autoReverse);
 StartPlayer(MW2, autoReverse);

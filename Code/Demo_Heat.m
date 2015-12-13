@@ -39,7 +39,21 @@ function value = F(t, x, y)
         value = value + 200000;
     end
 end
-[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F, approx, approxAsRank);
+
+function value = F2(t, x, y)
+    frac = t / T;
+    maxR = 0.25;
+    d1 = sqrt((x-0.25)^2 + (y-0.5)^2);
+    d2 = sqrt((x-0.5)^2 + (y-0.5)^2);
+    value = 0;
+    if d1 <= maxR * sin(frac * 2 * pi)
+        value = 200000;
+    end
+    if d2 <= maxR * sin(frac * 2 * pi + pi/2)
+        value = value + 200000;
+    end
+end
+[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F2, approx, approxAsRank);
 
 Animated_Surf(Frames, X, Y, tau, slowDownFactor);
 
