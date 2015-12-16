@@ -8,6 +8,7 @@ if nargin <= 1 || isempty(map)
     %map = colormap('jet'); % this would open an empty figure
     map = jet(size(get(0,'defaultfigurecolormap'),1));
 end
+Frames(Frames>256)= 256;
 Movie = immovie(Frames,map);
 
 end

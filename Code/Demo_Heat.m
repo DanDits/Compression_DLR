@@ -1,4 +1,4 @@
-function [Frames, X, Y, tau] = Demo_Heat(GridType, approx, fixedRank)
+function [Frames, X, Y, tau] = Demo_Heat(GridType, varargin)
 
 %For solving the two dimensional heat equation dA/dt - laplace(A) = F(A)
 %with dirichlet boundary conditions on an arbitrary domain D we get the
@@ -6,26 +6,39 @@ function [Frames, X, Y, tau] = Demo_Heat(GridType, approx, fixedRank)
 %then propagate the solution in time by calculating dA/dt = F(A) using
 %Dynamic low rank approximation (DLR)
 
+%% Setup and parse parameters to Demo function
+
+%set default values
+availableGrids = {'S', 'L', 'C', 'D', 'A', 'H', 'B', 'N', 'E'}; %see numgrid and numgridEllipse
+approx = 0.33; %default approximation level, keep only one third of data
+approxRankFixed = true; %default if approximation level is fixed during approximation
+
+inp = inputParser;
+addRequired(inp, 'GridType', @(x) any(validatestring(x, availableGrids)));
+addParameter(inp,'approx',approx,@isnumeric);
+addParameter(inp,'rank',0,@isnumeric);
+addParameter(inp,'fixed',approxRankFixed,@islogical);
+
+parse(inp,GridType, varargin{:});
+approx = inp.Results.approx;
+approxAsRank = approx > 2;
+if inp.Results.rank > 0
+    %explicitly wants to use given rank for approximation
+    approx = inp.Results.rank;
+    approxAsRank = true;
+end
+approxRankFixed = inp.Results.fixed;
+
+%% Start setup of functions for calculation
 close all hidden
-if nargin <= 1
-    approx = 0.33; %default approximation level, keep only one third of data
-end
-if nargin <= 2
-    approxRankFixed = '';
-elseif strcmp(fixedRank, 'fixed')
-    approxRankFixed = '!';
-end
-approxAsRank = strcat('', approxRankFixed);
-if approx > 1
-    approxAsRank = strcat('asrank', approxRankFixed);
-end
+
 %grid inside region [0,1]x[0,1]
-T = 15;
-tau = 0.05;
-slowDownFactor = 1;
+T = 15; %Time goes from 0 to T
+tau = 0.05; % timestep
+slowDownFactor = 1; %for visualization: higher to slow down movie
+n = 128; %discretization of grid, how many nodes in one dimension
 
-n = 128;
-
+%Some inhomogenity functions F for the right hand side of the heat equation
 function value = F(t, x, y)
     frac = t / T;
     r = 0.05;
@@ -53,7 +66,15 @@ function value = F2(t, x, y)
         value = value + 200000;
     end
 end
-[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F2, approx, approxAsRank);
+
+approxParam = '';
+if approxAsRank
+    approxParam = 'asrank';
+end
+if approxRankFixed
+    approxParam = strcat(approxParam, '!');
+end
+[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F, approx, approxParam);
 
 Animated_Surf(Frames, X, Y, tau, slowDownFactor);
 

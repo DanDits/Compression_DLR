@@ -66,23 +66,33 @@ for i = 1:frameCount
     ranks(i) = currR;
     Frames(:,:,i) = MakeFrame(U, S, V);
     
-    %FOR TESTING SOME PROPERTIES OF VVS FOR SOME FRAMES ONLY:
-%     if i >= 8 && i <= 11
+%     %FOR TESTING SOME PROPERTIES OF VVS FOR SOME FRAMES ONLY:
+%     if i >= 1 && i <= 17
 %         
 %         aRank = rank(FRAMESIN(:,:,i));
 %         [~,~,AV] = Get_Rank_Approx(FRAMESIN(:,:,i), currR);
 %         VVS = AV'*V;
+%         
 %         disp(strcat(num2str(i), '_: rankA=', num2str(aRank), ' norm vv_s=', num2str(norm(VVS)), ...
 %             ' cond vv_s=', num2str(cond(VVS)), ' rank vv_s=', num2str(rank(VVS)), ...
-%             ' dim vv_s=', num2str(size(VVS, 1))));
+%             ' dim vv_s=', num2str(size(VVS, 1)),...
+%             'norm vv_s-I=', num2str(norm(VVS-eye(currR)))));
+%       
+%         
+%         SBNULL = (eye(frameDim(1)) - U*U')*FRAMESIN(:,:,i);
+%         disp(strcat(num2str(i), '__: norm=', num2str(norm(SBNULL)), ' rank=', num2str(rank(SBNULL)),...
+%             ' dim=', num2str(size(SBNULL, 1)), 'x', num2str(size(SBNULL, 2))));
 %     end
-    
+
     %except for the last frame, perform the DLR step to the next frame
     if i < frameCount
         %GetDelta is a given function, can be a delta to the next frame or
         %a function that depends on the current frame and timestep
         DeltaA = GetDelta(Frames(:,:,i), i);
+        
         [U,S,V] = DLR_Step(U, S, V, DeltaA);
+        
+        %% If rank is not fixed we adaptively make it smaller or bigger
         if ~fixedRank
             D = abs(diag(S)); % S is upper triangle matrix from default DLR_Step
             % If S does not have such a simple form we would need to check its SVD
@@ -107,26 +117,5 @@ for i = 1:frameCount
         end
     end
 end
-
-end
-
-function [U,S,V] = Get_Rank_Approx(A, r)
-% Calculate singular value decomposition and use spectral cutoff to get
-% rank r
-
-[U,S,V] = svd(A, 'econ');
-
-%Sort to cut off greatest eigenvalues (absolute value) 
-% and make matrix rank <= r, eigenvalues of svd are already sorted
-%[S,SortInd]=sort(abs(diag(S)), 'descend');
-%SortInd = SortInd(1:r);
-
-S = diag(S);
-SortInd = 1:r;
-
-%Spectral cut off and set new smaller U,S,V
-U = U(:,SortInd);
-S = diag(S(SortInd));
-V = V(:,SortInd);
 
 end

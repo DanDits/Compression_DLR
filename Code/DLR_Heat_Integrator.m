@@ -47,7 +47,7 @@ function DeltaA = Get_Delta(Current, stepIndex)
     end
     DeltaA = tau * (Solve_Laplace(M, fVector, innerIndicies, hCorrected, Grid) - Current);
 end
-if nargin <= 7
+if nargin <= 6
     approxAsRank = '';
 end
 StartA = zeros(size(Grid));
