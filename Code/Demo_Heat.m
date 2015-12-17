@@ -10,14 +10,12 @@ function [Frames, X, Y, tau] = Demo_Heat(GridType, varargin)
 
 %set default values
 availableGrids = {'S', 'L', 'C', 'D', 'A', 'H', 'B', 'N', 'E'}; %see numgrid and numgridEllipse
-approx = 0.33; %default approximation level, keep only one third of data
-approxRankFixed = true; %default if approximation level is fixed during approximation
 
 inp = inputParser;
 addRequired(inp, 'GridType', @(x) any(validatestring(x, availableGrids)));
-addParameter(inp,'approx',approx,@isnumeric);
+addParameter(inp,'approx',0.33,@isnumeric);
 addParameter(inp,'rank',0,@isnumeric);
-addParameter(inp,'fixed',approxRankFixed,@islogical);
+addParameter(inp,'fixed',true,@islogical);
 
 parse(inp,GridType, varargin{:});
 approx = inp.Results.approx;
@@ -67,14 +65,11 @@ function value = F2(t, x, y)
     end
 end
 
-approxParam = '';
+approxParam = 'approx';
 if approxAsRank
-    approxParam = 'asrank';
+    approxParam = 'rank';
 end
-if approxRankFixed
-    approxParam = strcat(approxParam, '!');
-end
-[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F, approx, approxParam);
+[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F, approxParam, approx, 'fixed', approxRankFixed);
 
 Animated_Surf(Frames, X, Y, tau, slowDownFactor);
 

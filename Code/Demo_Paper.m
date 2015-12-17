@@ -12,7 +12,6 @@ function [ ] = Demo_Paper(varargin)
 %% Setup and parse parameters to Demo function
 
 %set default values
-availableGrids = {'S', 'L', 'C', 'D', 'A', 'H', 'B', 'N', 'E'}; %see numgrid and numgridEllipse
 approx = 0.33; %default approximation level, keep only one third of data
 approxRankFixed = true; %default if approximation level is fixed during approximation
 
@@ -45,9 +44,6 @@ T1 = Generate_Skew_Symmetric(n);
 T2 = Generate_Skew_Symmetric(n);
 Q1Start = eye(n); %Generate_Orthogonal(n);
 Q2Start = eye(n); %Generate_Orthogonal(n);
-function Frame = Make_Simple_Frame(U, S, V)
-    Frame = U * S * V';
-end
 
 function DeltaA = Get_Delta_With_Current(Current, stepIndex)
     time = stepIndex * h;
@@ -75,8 +71,22 @@ end
 if approxRankFixed
     approxParam = strcat(approxParam, '!');
 end
-[FramesTraditional, ~] = DLR(StartA, timeSteps, @Get_Delta_Traditional, @Make_Simple_Frame, approx, approxParam);
-[FramesWithCurrent, ~] = DLR(StartA, timeSteps, @Get_Delta_With_Current, @Make_Simple_Frame, approx, approxParam);
+FramesTraditional = zeros(size(StartA, 1), size(StartA, 2), timeSteps);
+function Frame = Make_Traditional_Frame(U, S, V, frameIndex)
+   Frame = U * S * V';
+   FramesTraditional(:,:,frameIndex) = Frame;   
+end
+FramesWithCurrent = zeros(size(StartA, 1), size(StartA, 2), timeSteps);
+function Frame = Make_Frame_With_Current(U, S, V, frameIndex)
+   Frame = U * S * V';
+   FramesWithCurrent(:,:,frameIndex) = Frame;   
+end
+approxParam = 'approx';
+if approxAsRank
+    approxParam = 'rank';
+end
+DLR(StartA, timeSteps, @Get_Delta_Traditional, @Make_Traditional_Frame, approxParam, approx, 'fixed', approxRankFixed);
+DLR(StartA, timeSteps, @Get_Delta_With_Current, @Make_Frame_With_Current, approxParam, approx, 'fixed', approxRankFixed);
 
 %% Plot the error of approximated frames to true frames(A at time steps)
 figure();

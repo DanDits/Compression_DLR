@@ -34,15 +34,26 @@ function DeltaA = Get_Delta(Current, i)
 end
 StartA = FramesIn(:,:,1); %Starting value
 
-approxParam = '';
+approxParam = 'approx';
 if approxAsRank
-    approxParam = 'asrank';
+    approxParam = 'rank';
 end
-if approxRankFixed
-    approxParam = strcat(approxParam, '!');
+Frames = zeros(size(StartA, 1), size(StartA, 2), frameCount);
+function Frame = Make_Frame(U, S, V, frameIndex)
+    %MAKE_FRAME Out of the decomposition Y = U*S*V' generate a valid frame
+    %   This implements the default behavior, that is returning Y and ensuring
+    %   that no entry is lower than 1 by setting those to exactly 1. This is
+    %   expected by indexed bitmaps. Values are not guaranteed to be integers.
+
+    Frame = U * S * V';
+    %normalize if value is out of bounds
+    %for indexed image all values need to be >=1
+    Frame(Frame < 1) = 1;
+    if frameIndex >= 1
+        Frames(:,:,frameIndex) = Frame;
+    end
 end
-Frame_Maker = @Make_Frame;
-[Frames, approxRanks] = DLR(StartA, frameCount, @Get_Delta, Frame_Maker, approx, approxParam);
+approxRanks = DLR(StartA, frameCount, @Get_Delta, @Make_Frame, approxParam, approx, 'fixed', approxRankFixed);
 
 %% If requested setup best approximation in rank r manifold
 FramesBestApprox = [];
@@ -50,7 +61,7 @@ if showBestApprox
    FramesBestApprox = zeros(size(Frames));
    for i = 1:frameCount
        [U,S,V] = Get_Rank_Approx(FramesIn(:,:,i), approxRanks(i));
-       FramesBestApprox(:,:,i) = Frame_Maker(U, S, V);
+       FramesBestApprox(:,:,i) = Make_Frame(U, S, V, -1);
    end
 end
 
