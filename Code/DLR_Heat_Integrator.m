@@ -67,18 +67,23 @@ function DeltaA = Get_Delta(Current, stepIndex)
         end
     end
     DeltaA = tau * (Solve_Laplace(M, fVector, innerIndicies, hCorrected, Grid) - Current);
+    
+%    DeltaA = tau * (Get_Laplace(M, Current, innerIndicies, hCorrected, Grid) - Current);
 end
 approxParam = 'approx';
 if approxAsRank
     approxParam = 'rank';
 end
+
 StartA = zeros(size(Grid));
+
 frameCount = timeSteps + 1;
 Frames = zeros(size(StartA, 1), size(StartA, 2), frameCount);
 function Frame = Make_Simple_Frame(U, S, V, frameIndex)
     Frame = U * S * V';
     Frames(:,:,frameIndex) = Frame;
 end
+
 DLR(StartA, frameCount, @Get_Delta, @Make_Simple_Frame, approxParam, approx, 'fixed', approxRankFixed);
 end
 
@@ -87,4 +92,17 @@ u = M\fVector;
 A = zeros(size(Grid));
 A(innerIndicies) = h^2 * full(u(Grid(innerIndicies))); 
 
+end
+
+function A = Get_Laplace(M, CurrA, innerIndicies, h, Grid)
+currU = zeros(length(innerIndicies), 1);
+currU(Grid(innerIndicies))=CurrA(innerIndicies);
+
+currU = M * currU; %laplace of current
+A = zeros(size(Grid));
+A(innerIndicies) = h^2 * full(currU(Grid(innerIndicies))); 
+values='VALUES'
+norm(A-CurrA)
+max(max(A))
+max(max(CurrA))
 end

@@ -31,9 +31,9 @@ approxRankFixed = inp.Results.fixed;
 close all hidden
 
 %grid inside region [0,1]x[0,1]
-T = 15; %Time goes from 0 to T
+T = 5; %Time goes from 0 to T
 tau = 0.05; % timestep
-slowDownFactor = 1; %for visualization: higher to slow down movie
+slowDownFactor = 5; %for visualization: higher to slow down movie
 n = 128; %discretization of grid, how many nodes in one dimension
 
 %Some inhomogenity functions F for the right hand side of the heat equation
@@ -53,15 +53,26 @@ end
 
 function value = F2(t, x, y)
     frac = t / T;
-    maxR = 0.25;
-    d1 = sqrt((x-0.25)^2 + (y-0.5)^2);
-    d2 = sqrt((x-0.5)^2 + (y-0.5)^2);
-    value = 0;
-    if d1 <= maxR * sin(frac * 2 * pi)
-        value = 200000;
+    if frac > 0.8
+        value = 0;
+        return;
     end
-    if d2 <= maxR * sin(frac * 2 * pi + pi/2)
-        value = value + 200000;
+    %Heat in annulus for half of the time, sinus shaped to border of
+    %annulus
+    maxR = 0.3;
+    minR = 0.25;
+    d1 = sqrt((x-0.5)^2 + (y-0.5)^2);
+    value = 0;
+    if d1 <= maxR && d1 >= minR
+        value = 200 * sin((d1 - minR) / (maxR - minR) * pi);
+    end
+end
+
+function value = F3(t, x, y) 
+    if (t <= T/2)
+        value = 10;
+    else
+        value = 2;
     end
 end
 
@@ -69,7 +80,7 @@ approxParam = 'approx';
 if approxAsRank
     approxParam = 'rank';
 end
-[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F, approxParam, approx, 'fixed', approxRankFixed);
+[Frames, X, Y] = DLR_Heat_Integrator(GridType, n, tau, T, @F3, approxParam, approx, 'fixed', approxRankFixed);
 
 Animated_Surf(Frames, X, Y, tau, slowDownFactor);
 

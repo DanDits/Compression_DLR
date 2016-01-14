@@ -1,6 +1,7 @@
-function [] = VisualizeFrame(Frame)
+function [] = VisualizeFrame(Frame, map)
 %% Plot the fractal with default color map
 figure;
 image(Frame)
-colormap('jet')
-colorbar
+if nargin > 1
+    colormap(map);
+end

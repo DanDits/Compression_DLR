@@ -64,13 +64,6 @@ end
 timeSteps = round(endT / h);
 StartA = Q1Start * (A1 + A2) * Q2Start';
 
-approxParam = '';
-if approxAsRank
-    approxParam = 'asrank';
-end
-if approxRankFixed
-    approxParam = strcat(approxParam, '!');
-end
 FramesTraditional = zeros(size(StartA, 1), size(StartA, 2), timeSteps);
 function Frame = Make_Traditional_Frame(U, S, V, frameIndex)
    Frame = U * S * V';
