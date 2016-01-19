@@ -43,8 +43,10 @@ addRequired(inp, 'Make_Frame', @ (f) isa(f, 'function_handle'));
 addParameter(inp,'approx',0.33,@isnumeric);
 addParameter(inp,'rank',0,@isnumeric);
 addParameter(inp,'fixed',true,@islogical);
+addParameter(inp,'showVTV',false,@islogical);
 
 parse(inp,StartA,frameCount,Get_Delta,Make_Frame,varargin{:});
+showVTV = inp.Results.showVTV;
 
 % and r = approx/2 * sqrt(n*m), the factor 1/2 since we need to 'store' two
 % matrices U and V, we ignore the matrix of size r^2/2 for the approxfactor
@@ -71,29 +73,27 @@ currR = maxR;
 [U,S,V] = Get_Rank_Approx(StartA, currR);
 %S is now diagonal, though it would only need to be invertible
 
-%Now do the iteration and perform a step with each delta 
+%Now do the iteration and perform a step with each delta
+global FRAMESIN %DEBUGGING VTV
 for i = 1:frameCount
     %Save to Frames
     ranks(i) = currR;
     CurrentFrame = Make_Frame(U, S, V, i);
     
-%     %FOR TESTING SOME PROPERTIES OF VVS FOR SOME FRAMES ONLY:
-%     if i >= 1 && i <= 17
-%         
-%         aRank = rank(FRAMESIN(:,:,i));
-%         [~,~,AV] = Get_Rank_Approx(FRAMESIN(:,:,i), currR);
-%         VVS = AV'*V;
-%         
-%         disp(strcat(num2str(i), '_: rankA=', num2str(aRank), ' norm vv_s=', num2str(norm(VVS)), ...
-%             ' cond vv_s=', num2str(cond(VVS)), ' rank vv_s=', num2str(rank(VVS)), ...
-%             ' dim vv_s=', num2str(size(VVS, 1)),...
-%             'norm vv_s-I=', num2str(norm(VVS-eye(currR)))));
-%       
-%         
-%         SBNULL = (eye(frameDim(1)) - U*U')*FRAMESIN(:,:,i);
-%         disp(strcat(num2str(i), '__: norm=', num2str(norm(SBNULL)), ' rank=', num2str(rank(SBNULL)),...
-%             ' dim=', num2str(size(SBNULL, 1)), 'x', num2str(size(SBNULL, 2))));
-%     end
+    %FOR TESTING SOME PROPERTIES OF VVS FOR SOME FRAMES ONLY:
+    if showVTV
+        if i >= 1 && i <= 17
+
+            aRank = rank(FRAMESIN(:,:,i+1));
+            [~,~,AV] = Get_Rank_Approx(FRAMESIN(:,:,i+1), currR);
+            VVS = AV'*V;
+
+            disp(strcat('L=',num2str(i+1), '_: rankA=', num2str(aRank), ' norm vv_s=', num2str(norm(VVS)), ...
+                ' cond vv_s=', num2str(cond(VVS)), ' rank vv_s=', num2str(rank(VVS)), ...
+                ' dim vv_s=', num2str(size(VVS, 1))));
+
+        end
+    end
 
     %except for the last frame, perform the DLR step to the next frame
     if i < frameCount

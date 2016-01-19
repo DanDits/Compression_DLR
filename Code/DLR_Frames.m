@@ -4,6 +4,10 @@ function [Frames, FramesBestApprox] = DLR_Frames(FramesIn, varargin)
 
 %% Setup and parse parameters to Demo function
 
+%DEBUG:
+global FRAMESIN;
+FRAMESIN=FramesIn;
+
 inp = inputParser;
 addRequired(inp, 'FramesIn');
 addParameter(inp,'approx',0.33,@isnumeric);
@@ -12,8 +16,10 @@ addParameter(inp,'fixed',true,@islogical);
 addParameter(inp,'ploterror',false,@islogical);
 addParameter(inp,'plotranks',false,@islogical);
 addParameter(inp,'showbestapprox',false,@islogical);
+addParameter(inp,'showVTV',false,@islogical);
 
 parse(inp,FramesIn, varargin{:});
+showVTV = inp.Results.showVTV;
 approx = inp.Results.approx;
 approxAsRank = approx > 2;
 if inp.Results.rank > 0
@@ -53,7 +59,7 @@ function Frame = Make_Frame(U, S, V, frameIndex)
         Frames(:,:,frameIndex) = Frame;
     end
 end
-approxRanks = DLR(StartA, frameCount, @Get_Delta, @Make_Frame, approxParam, approx, 'fixed', approxRankFixed);
+approxRanks = DLR(StartA, frameCount, @Get_Delta, @Make_Frame, approxParam, approx, 'fixed', approxRankFixed, 'showVTV', showVTV);
 
 %% If requested setup best approximation in rank r manifold
 FramesBestApprox = [];

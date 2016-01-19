@@ -7,13 +7,14 @@ function [U, S, V] = DLR_Step(U, S, V, DeltaA)
 %see 3.2 in paper, given Y = USV' and DeltaA 
 % calculate same decomposition for next A, exact if rank A <= r
 % computational cost: O(mnr + (m+n)r^2), for size(DeltaA)=m,n and len(S)=r
+DeltaAV = DeltaA*V;
 
 %Step1:
-K = U * S + DeltaA * V;
+K = U * S + DeltaAV;
 [U, S] = qr(K, 0); %U*S = K, U orthonormal, S upper tridiagonal
 
 %Step2:
-S = S - U' * DeltaA * V;
+S = S - U' * DeltaAV;
 
 %Step3:
 L = V * S' + DeltaA' * U;

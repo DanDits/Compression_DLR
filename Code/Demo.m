@@ -17,8 +17,10 @@ addParameter(inp,'rank',0,@isnumeric);
 addParameter(inp,'fixed',true,@islogical);
 addParameter(inp,'autoplay',true,@islogical);
 addParameter(inp,'showbestapprox',false,@islogical);
+addParameter(inp,'showVTV',false,@islogical);
 
 parse(inp,varargin{:});
+showVTV = inp.Results.showVTV;
 approx = inp.Results.approx;
 approxAsRank = approx > 2;
 if inp.Results.rank > 0
@@ -48,13 +50,21 @@ if ~isempty(type)
 else
     MW1 = implay(M); %reopen
 end
-
+if ~isempty(map)
+    figure;
+    rgbplot(map);
+    title('Colormap used');
+    legend('Red', 'Green', 'Blue');
+    xlabel('Matrix entry value');
+    ylabel('Influence of color');
+end
 approxParam = 'approx';
 if approxAsRank
     approxParam = 'rank';
 end
 [FramesC, FramesBestApprox] = DLR_Frames(Frames, 'approx', approx, approxParam, approx, 'fixed', approxRankFixed,...
-    'ploterror', true, 'plotranks', true, 'showbestapprox', showBestApprox); 
+    'ploterror', true, 'plotranks', true, 'showbestapprox', showBestApprox,...
+    'showVTV', showVTV); 
 M2 = FramesToMovie(FramesC, map); MW2=implay(M2);
 
 if showBestApprox
