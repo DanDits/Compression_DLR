@@ -1,4 +1,4 @@
-function [] = Demo_GameOfLife(startType, approx)
+function [] = Demo_GameOfLife(startType, approxRank)
 %Versuchsreihe für n=100, startType='rect' (=von 1/3 bis 2/3 rechteck
 %lebendig starten), evolutionSteps = 100
 %('box', 31) ->Exakte Berechnung
@@ -16,10 +16,10 @@ close all hidden
 n = 100;
 map = [0.2 1. 0.1; 0.9 0.1 0.1];
 evolutionSteps = 100;
-if approx < 1
-    approx = 1;
+if approxRank < 1
+    approxRank = 1;
 end
-approx = round(approx);
+approxRank = round(approxRank);
 
 if strcmp(startType,'random')
     StartA = rand(n);StartA(StartA>=0.5)=1;StartA(StartA<0.5)=0;%Random, dies very fast
@@ -45,7 +45,7 @@ function Frame = Make_Frame(U, S, V, frameIndex)
 end
 
 
-r=DLR(StartA, evolutionSteps, @Get_Delta, @Make_Frame, 'rank', approx, 'fixed', true);
+r=DLR(StartA, evolutionSteps, @Get_Delta, @Make_Frame, 'rank', approxRank, 'fixed', true);
 M = FramesToMovie(Frames, map); 
 MW=implay(M);
 set(MW.Parent, 'Name', 'Compressed');
@@ -55,6 +55,11 @@ MT = FramesToMovie(TrueSolutions, map);
 MWT=implay(MT);
 set(MWT.Parent, 'Name', 'Original solution');
 set(MWT.Parent,'units','normalized','outerposition',[0 0 0.5 1])
+
+%Export to gif for showing in other medium than matlab, not useful for
+%compression
+%movie2gif(M,strcat('GOL',startType,'_DLR.gif'),'LoopCount', Inf);
+%movie2gif(MT,strcat('GOL',startType,'.gif'),'LoopCount', Inf);
 
 errors = zeros(length(evolutionSteps), 1);
 ranksT = zeros(length(evolutionSteps), 1);
