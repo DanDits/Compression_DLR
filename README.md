@@ -7,9 +7,15 @@ Demos and implementation created for a university talk of 90 minutes. German sli
 Based on paper *A projector-splitting integrator for dynamical low-rank approximation* from [Christian Lubich](https://na.uni-tuebingen.de/~lubich/) and [Ivan V. Oseledets](http://oseledets.github.io/people/oseledets/) published in Springer in 2013. ([Source](http://arxiv.org/pdf/1301.1058.pdf) from university network)
 
 ##Examples
-TODO
+Demo type fractal: original-bestapproximation-DLR with 33% data and 100 generations
+![Original fractal](DemoGifs/fractalNormal.gif  "Original") ![Bestapprox fractal](DemoGifs/fractal033_BestApprox.gif  "Best approximation") ![DLR fractal](DemoGifs/fractal033_DLR.gif  "DLR") 
+
+Demo_GameOfLife: original-DLR with 33% data
+![Original GOL](DemoGifs/GOLbox.gif  "Original") ![DLR GOL](DemoGifs/GOLbox_DLR.gif  "DLR") 
 ##Implementation
 Implementation is done in matlab, though the project core could be easily exported to python using numpy. 
+Hint: For running the Demos you will need the ImageProcessingToolbox (v.9.3) to show the generated movies and frames.
+
 The most important is the [DLR](Code/DLR.m) routine with its core being the [DLR_Step](Code/DLR_Step.m).
 Uses a project splitting of order 1, this could be extended to projector splittings of higher order (for order 2 see paper). For this the DLR_Step would need to be adjusted.
 
