@@ -71,6 +71,15 @@ if showBestApprox
     M3 = FramesToMovie(FramesBestApprox, map); MW3=implay(M3);
     set(MW3.Parent,'units','normalized','outerposition',[0.25 0 0.5 1])
     set(MW3.Parent, 'Name', strcat('Best approximation data, approx=', num2str(approx)));
+    toGif(M,strcat(type, 'Normal.gif'))
+    toGif(M2,strcat(type, '033_DLR.gif'));
+    toGif(M3,strcat(type, '033_BestApprox.gif'));
+end
+
+function toGif(Movie, Name)
+%Export to gif for showing in other medium than matlab, not useful for
+%compression
+    %movie2gif(Movie,Name,'LoopCount', Inf);
 end
 
 %% UI fine tuning
@@ -90,4 +99,5 @@ if autoPlay
     if showBestApprox
        StartPlayer(MW3, autoReverse); 
     end
+end
 end
